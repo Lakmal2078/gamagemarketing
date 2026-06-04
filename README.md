@@ -1,20 +1,71 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Gamage Marketing - Digital Agency Website
 
-# Run and deploy your AI Studio app
+A modern, highly interactive, and bilingual (English & Sinhala) landing page for Gamage Marketing — a digital marketing and branding agency. Built entirely with React, Vite, Tailwind CSS, and Framer Motion.
 
-This contains everything you need to run your app locally.
+## 🌟 Features
 
-View your app in AI Studio: https://ai.studio/apps/b212089d-6b53-493a-918a-ce3f1300b734
+- **Bilingual Support (English & Sinhala):** Seamlessly switch between languages with smooth animations and state persistence.
+- **Interactive Project Cost Estimator:** A built-in calculator allowing clients to estimate out their project costs based on different service modules.
+- **Advanced Contact Form:** Capture lead specific requirements through a comprehensive and stylish form.
+- **High-Performance Animations:** Premium scroll effects, parallax sections, and smooth micro-interactions powered by Framer Motion.
+- **Responsive & Mobile-First:** Carefully crafted to perform beautifully on all screen sizes.
+- **Google Analytics Integration:** Built-in React-GA4 event tracking.
+- **Modern UI/UX Elements:** Glassmorphism cards, animated gradients, and floating action buttons.
 
-## Run Locally
+## 🛠️ Technologies Used
 
-**Prerequisites:**  Node.js
+- **Framework:** [React 18](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
+- **Animations:** [Framer Motion](https://www.framer.com/motion/)
+- **Icons:** FontAwesome (via CDN)
+- **Analytics:** `react-ga4`
 
+## 🚀 Getting Started
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Follow these steps to set up the project locally:
+
+### Prerequisites
+
+- Node.js (v18 or higher recommended)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/gamage-marketing.git
+   cd gamage-marketing
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Set up Environment Variables (Optional):**
+   If you have specific Analytics IDs, update the `ReactGA.initialize('G-XXXXXXXXXX')` string in `App.tsx` or set it up via a `.env` file. (Currently uses `G-RZHZQ9SL61`).
+
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Build for production:**
+   ```bash
+   npm run build
+   ```
+
+## 📂 Project Structure
+
+- `src/App.tsx` - The main application file containing all components, state logic, and translation objects.
+- `src/index.css` - Global CSS styles and Tailwind module imports.
+- `src/main.tsx` - React application bootstrapper.
+- `package.json` - Project metadata and dependencies.
+
+## 📄 License
+
+This project is open-source and free to use. (You can update this to an MIT license or proprietary license based on your business model).
+
+---
+*Built with modern web technologies to maximize digital presence and performance.*
