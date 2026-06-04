@@ -92,6 +92,7 @@ const T = {
     modalChat: "Chat on WhatsApp",
     themeLight: "පැහැදිලි තේමාව",
     themeDark: "අඳුරු තේමාව",
+    scrollToTop: "මුදුනටම යන්න",
   },
   en: {
     logo: "Gamage Marketing",
@@ -156,6 +157,7 @@ const T = {
     modalChat: "Chat on WhatsApp",
     themeLight: "Light Theme",
     themeDark: "Dark Theme",
+    scrollToTop: "Scroll to Top",
   }
 };
 
@@ -837,6 +839,30 @@ export default function App() {
     }
   }, [theme]);
 
+  // Scroll to Top Button state
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show scroll-to-top button when scrolled past 500px (typically past the hero section)
+      if (window.scrollY > 500) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleScrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   // Mobile Menu State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -1176,9 +1202,19 @@ export default function App() {
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-8">
-              <h3 className="text-2xl font-bold tracking-tight text-white mb-1">{T[lang].projectsLuxuryFashion}</h3>
-              <p className="text-cyan-400 text-sm font-medium">{T[lang].projectsMarketingCampaign}</p>
+            {/* Smooth background overlay transition */}
+            <div className="portfolio-overlay absolute inset-0 z-10" />
+            
+            {/* Category badge clearly displayed and styled */}
+            <div className="absolute top-6 left-6 z-20 transition-all duration-300">
+              <span className="portfolio-badge text-[11px] font-extrabold px-3.5 py-1.5 rounded-full uppercase tracking-widest bg-cyan-500/20 text-cyan-400 border border-cyan-400/30 backdrop-blur-md">
+                {T[lang].projectsMarketingCampaign}
+              </span>
+            </div>
+
+            <div className="absolute inset-x-0 bottom-0 p-8 z-20 flex flex-col justify-end">
+              <h3 className="text-2xl font-bold tracking-tight text-white mb-1 group-hover:text-cyan-300 transition-colors duration-300">{T[lang].projectsLuxuryFashion}</h3>
+              <p className="text-slate-300 text-sm opacity-80 group-hover:opacity-100 transition-opacity duration-300">{lang === 'si' ? 'සාර්ථක අලෙවිකරණ ව්‍යාපාරයක්' : 'Successful marketing campaign integration.'}</p>
             </div>
           </FadeInView>
 
@@ -1189,9 +1225,19 @@ export default function App() {
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-8">
-              <h3 className="text-2xl font-bold tracking-tight text-white mb-1">{T[lang].projectsFintech}</h3>
-              <p className="text-cyan-400 text-sm font-medium">{T[lang].projectsUiUxDesign}</p>
+            {/* Smooth background overlay transition */}
+            <div className="portfolio-overlay absolute inset-0 z-10" />
+            
+            {/* Category badge clearly displayed and styled */}
+            <div className="absolute top-6 left-6 z-20 transition-all duration-300">
+              <span className="portfolio-badge text-[11px] font-extrabold px-3.5 py-1.5 rounded-full uppercase tracking-widest bg-cyan-500/20 text-cyan-400 border border-cyan-400/30 backdrop-blur-md">
+                {T[lang].projectsUiUxDesign}
+              </span>
+            </div>
+
+            <div className="absolute inset-x-0 bottom-0 p-8 z-20 flex flex-col justify-end">
+              <h3 className="text-2xl font-bold tracking-tight text-white mb-1 group-hover:text-cyan-300 transition-colors duration-300">{T[lang].projectsFintech}</h3>
+              <p className="text-slate-300 text-sm opacity-80 group-hover:opacity-100 transition-opacity duration-300">{lang === 'si' ? 'නවීන UI/UX මෘදුකාංග සැලසුම්කරණය' : 'Cutting-edge fintech software experience design.'}</p>
             </div>
           </FadeInView>
 
@@ -1202,9 +1248,19 @@ export default function App() {
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-8">
-              <h3 className="text-2xl font-bold tracking-tight text-white mb-1">{T[lang].projectsCreativeAgency}</h3>
-              <p className="text-cyan-400 text-sm font-medium">{T[lang].projectsBrandIdentity}</p>
+            {/* Smooth background overlay transition */}
+            <div className="portfolio-overlay absolute inset-0 z-10" />
+            
+            {/* Category badge clearly displayed and styled */}
+            <div className="absolute top-6 left-6 z-20 transition-all duration-300">
+              <span className="portfolio-badge text-[11px] font-extrabold px-3.5 py-1.5 rounded-full uppercase tracking-widest bg-cyan-500/20 text-cyan-400 border border-cyan-400/30 backdrop-blur-md">
+                {T[lang].projectsBrandIdentity}
+              </span>
+            </div>
+
+            <div className="absolute inset-x-0 bottom-0 p-8 z-20 flex flex-col justify-end">
+              <h3 className="text-2xl font-bold tracking-tight text-white mb-1 group-hover:text-cyan-300 transition-colors duration-300">{T[lang].projectsCreativeAgency}</h3>
+              <p className="text-slate-300 text-sm opacity-80 group-hover:opacity-100 transition-opacity duration-300">{lang === 'si' ? 'සන්නාම අනන්‍යතාවය සහ නිර්මාණකරණය' : 'Complete visual branding and brand deployment.'}</p>
             </div>
           </FadeInView>
         </div>
@@ -1763,6 +1819,19 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Floating Scroll to Top button */}
+      <button
+        onClick={handleScrollToTop}
+        className={`fixed bottom-28 right-8 w-12 h-12 rounded-full flex items-center justify-center text-white bg-slate-900/85 hover:bg-slate-800 border border-white/20 hover:border-cyan-400 hover:text-cyan-400 backdrop-blur-md shadow-2xl z-40 transition-all duration-300 cursor-pointer ${
+          showScrollTop ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-75 pointer-events-none'
+        }`}
+        aria-label={T[lang].scrollToTop}
+        title={T[lang].scrollToTop}
+        id="scroll-to-top-btn"
+      >
+        <i className="fas fa-chevron-up text-lg" />
+      </button>
 
       {/* Floating Sticky Pulse WhatsApp icon button */}
       <a

@@ -481,3 +481,77 @@ html.theme-light section {
   border-top-color: rgba(15, 23, 42, 0.08) !important;
 }
 
+/* Scroll to Top floating button overrides for light theme */
+html.theme-light #scroll-to-top-btn {
+  background-color: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08) !important;
+}
+
+html.theme-light #scroll-to-top-btn:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #06b6d4 !important;
+  color: #06b6d4 !important;
+}
+
+/* Project Portfolio Cards Scale-up Hover and transition */
+.portfolio-card {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.portfolio-card:hover {
+  transform: scale(1.03) translateY(-4px) !important;
+  box-shadow: 0 30px 60px -15px rgba(6, 182, 212, 0.25) !important;
+  z-index: 10;
+}
+
+.portfolio-card img {
+  will-change: transform;
+}
+
+/* Portfolio Hover Overlay Transition */
+.portfolio-overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.45) 50%, rgba(0, 0, 0, 0.1) 100%) !important;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.portfolio-card:hover .portfolio-overlay {
+  background: linear-gradient(to top, rgba(8, 47, 73, 0.95) 0%, rgba(15, 23, 42, 0.7) 60%, rgba(8, 47, 73, 0.35) 100%) !important;
+}
+
+/* Portfolio Badge Transition */
+.portfolio-badge {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.portfolio-card:hover .portfolio-badge {
+  background-color: #06b6d4 !important;
+  color: #0f172a !important;
+  border-color: #22d3ee !important;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+}
+
+/* Theme Light Portfolio Card Shadows Override */
+html.theme-light .portfolio-card {
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.theme-light .portfolio-card:hover {
+  box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.08) !important;
+}
+
+html.theme-light .portfolio-badge {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #0891b2 !important;
+  border-color: rgba(8, 145, 178, 0.25) !important;
+}
+
+html.theme-light .portfolio-card:hover .portfolio-badge {
+  background-color: #06b6d4 !important;
+  color: #ffffff !important;
+  border-color: #06b6d4 !important;
+}
+
+
