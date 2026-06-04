@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, FormEvent, ReactNode } from 'react';
+import ReactGA from 'react-ga4';
+import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 
 // Interfaces
 interface ServiceDetail {
@@ -65,6 +67,10 @@ const T = {
     priceEnterprise: "Enterprise",
     priceChoosePlan: "Choose Plan",
     priceFeatured: "FEATURED",
+    estimatorTitle: "ව්‍යාපෘති පිරිවැය ඇස්තමේන්තුව (Calculator)",
+    estimatorSubtitle: "ඔබගේ අවශ්‍යතා මත පදනම්ව දළ මිල ගණනයක් ලබා ගන්න.",
+    estTotal: "ඇස්තමේන්තුගත මුළු පිරිවැය:",
+    estNote: "මෙය පැහැදිලි කිරීම සඳහා වූ දළ අගයක් පමණි. නිශ්චිත මිල ගණන් ව්‍යාපෘතිය අනුව වෙනස් විය හැක.",
     faqTitle: "නිතර අසන ප්‍රශ්න",
     faqSubtitle: "අපගේ සේවා සැපයීම, Deliverables සහ සහයෝගීතා ක්‍රියාවලිය පිළිබඳ පොදු ප්‍රශ්නවලට පිළිතුරු (FAQ).",
     reviewsTitle: "Client Reviews",
@@ -81,6 +87,10 @@ const T = {
     contactEmailPlaceholder: "ඊමේල් ලිපිනය",
     contactPhonePlaceholder: "දුරකථන අංකය",
     contactDescPlaceholder: "ඔබේ අවශ්‍යතාවය විස්තර කරන්න",
+    contactServiceInterest: "ඔබට අවශ්‍ය සේවාව කුමක්ද?",
+    contactBudget: "ඇස්තමේන්තුගත අයවැය",
+    contactCompanySize: "ව්‍යාපාරයේ ප්‍රමාණය",
+    contactSelectOption: "-- තෝරන්න --",
     contactSending: "යවමින්...",
     contactSubmit: "සම්බන්ධ වන්න",
     contactSuccess: "✓ සාර්ථකව ලැබුණි!",
@@ -130,6 +140,10 @@ const T = {
     priceEnterprise: "Enterprise",
     priceChoosePlan: "Choose Plan",
     priceFeatured: "FEATURED",
+    estimatorTitle: "Project Cost Estimator",
+    estimatorSubtitle: "Get a rough estimate based on your custom requirements.",
+    estTotal: "Estimated Total Cost:",
+    estNote: "This is a rough estimate for reference purposes. Final pricing may vary based on actual project scope.",
     faqTitle: "Frequently Asked Questions",
     faqSubtitle: "Answers to common questions about our service delivery, deliverables, and collaboration process.",
     reviewsTitle: "Client Reviews",
@@ -146,6 +160,10 @@ const T = {
     contactEmailPlaceholder: "Email Address",
     contactPhonePlaceholder: "Phone Number",
     contactDescPlaceholder: "Describe your requirements",
+    contactServiceInterest: "Interested Service",
+    contactBudget: "Estimated Budget",
+    contactCompanySize: "Company Size",
+    contactSelectOption: "-- Select Option --",
     contactSending: "Sending...",
     contactSubmit: "Submit",
     contactSuccess: "✓ Successfully Received!",
@@ -801,7 +819,115 @@ function FadeInView({ children, className = "", delay = "" }: FadeInViewProps) {
   );
 }
 
+// Cost Estimator Component
+interface CostEstimatorProps {
+  lang: 'si' | 'en';
+  T: any;
+}
+
+function CostEstimator({ lang, T }: CostEstimatorProps) {
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  
+  const services = [
+    { id: 'web', label: lang === 'si' ? 'Web Development (Basic)' : 'Web Development (Basic)', basePrice: 75000 },
+    { id: 'web_adv', label: lang === 'si' ? 'E-Commerce / Advanced Web' : 'E-Commerce / Advanced Web', basePrice: 150000 },
+    { id: 'branding', label: lang === 'si' ? 'Brand Identity Design' : 'Brand Identity Design', basePrice: 50000 },
+    { id: 'social_media', label: lang === 'si' ? 'Social Media Management (Monthly)' : 'Social Media Management (Monthly)', basePrice: 40000 },
+    { id: 'seo', label: lang === 'si' ? 'SEO Optimization' : 'SEO Optimization', basePrice: 35000 },
+    { id: 'ads', label: lang === 'si' ? 'Paid Ads Management (Setup + 1 month)' : 'Paid Ads Management (Setup + 1 month)', basePrice: 60000 },
+  ];
+
+  const toggleService = (id: string) => {
+    setSelectedServices(prev => 
+      prev.includes(id) ? prev.filter(serviceId => serviceId !== id) : [...prev, id]
+    );
+  };
+
+  const calculateTotal = () => {
+    return selectedServices.reduce((total, id) => {
+      const service = services.find(s => s.id === id);
+      return total + (service?.basePrice || 0);
+    }, 0);
+  };
+
+  return (
+    <div className="estimator-container bg-white/[0.03] border border-white/[0.08] p-8 rounded-[30px] backdrop-blur-md max-w-[800px] mx-auto text-left shadow-lg">
+      <h3 className="text-xl md:text-2xl font-bold mb-6 text-white text-center">{T[lang].estimatorTitle}</h3>
+      <p className="text-sm md:text-base text-slate-400 mb-8 text-center">{T[lang].estimatorSubtitle}</p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        {services.map(service => (
+          <div 
+            key={service.id} 
+            onClick={() => toggleService(service.id)}
+            className={`flex items-center justify-between p-4 rounded-xl cursor-pointer border transition-all duration-300 select-none ${
+              selectedServices.includes(service.id) 
+                ? 'bg-cyan-900/40 border-cyan-400 text-white shadow-[0_0_15px_rgba(34,211,238,0.2)]' 
+                : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-center gap-3 w-full">
+              <div className={`w-5 h-5 rounded flex items-center justify-center border shrink-0 transition-colors ${
+                selectedServices.includes(service.id) ? 'bg-cyan-400 border-cyan-400' : 'bg-transparent border-slate-500'
+              }`}>
+                {selectedServices.includes(service.id) && <i className="fas fa-check text-slate-900 text-xs" />}
+              </div>
+              <span className="text-sm font-medium leading-tight flex-1">{service.label}</span>
+              <span className="text-sm font-bold text-cyan-300 shrink-0 whitespace-nowrap">Rs. {service.basePrice.toLocaleString()}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="border-t border-white/10 pt-6 mt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <p className="text-slate-400 text-sm">{T[lang].estTotal}</p>
+          <div className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">
+            LKR {calculateTotal().toLocaleString()}
+          </div>
+        </div>
+        <a 
+          href={`#contact`} 
+          onClick={() => {
+            const el = document.getElementById('contactForm');
+            if(el) {
+              const info = selectedServices.map(id => services.find(s=>s.id === id)?.label).join(', ');
+              const textarea = el.querySelector('textarea[name="message"]') as HTMLTextAreaElement;
+              if (textarea) {
+                textarea.value = `I'm interested in: ${info}. (Estimated Total: LKR ${calculateTotal().toLocaleString()})`;
+              }
+            }
+          }}
+          className={`px-8 py-4 rounded-full font-bold transition-all ${
+            selectedServices.length > 0 
+              ? 'bg-gradient-to-r from-cyan-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-cyan-500/30' 
+              : 'bg-white/10 text-slate-400 cursor-not-allowed'
+          }`}
+          style={{ pointerEvents: selectedServices.length > 0 ? 'auto' : 'none' }}
+        >
+          {lang === 'si' ? 'මෙම පිරිවැයට සාකච්ඡා කරන්න' : 'Discuss this Estimate'}
+        </a>
+      </div>
+      <p className="text-xs text-slate-500 mt-6 text-center">{T[lang].estNote}</p>
+    </div>
+  );
+}
+
 export default function App() {
+  // Initialize Google Analytics ONCE
+  useEffect(() => {
+    // We use a placeholder Measurement ID, user can replace it with real ID
+    ReactGA.initialize('G-RZHZQ9SL61');
+    ReactGA.send({ hitType: "pageview", page: window.location.pathname });
+  }, []);
+
+  // Set up scroll for parallax
+  const { scrollY } = useScroll();
+  const heroY = useTransform(scrollY, [0, 1000], [0, 400]);
+  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
+  const bgY1 = useTransform(scrollY, [0, 2000], [0, -600]);
+  const bgY2 = useTransform(scrollY, [0, 2000], [0, 800]);
+
   // Language State (Sinhala default)
   const [lang, setLang] = useState<'si' | 'en'>(() => {
     return (localStorage.getItem('lang') as 'si' | 'en') || 'si';
@@ -878,6 +1004,7 @@ export default function App() {
 
   // Form submission feedback
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [showToast, setShowToast] = useState(false);
 
   // Handle auto dot updates on manual scroll
   const handleReviewsScroll = () => {
@@ -941,7 +1068,7 @@ export default function App() {
     });
 
     try {
-      const response = await fetch('https://formspree.io/f/xnjrgpea', {
+      const response = await fetch('https://formspree.io/f/mkoeqqpn', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -952,7 +1079,14 @@ export default function App() {
 
       if (response.ok) {
         setFormStatus('success');
+        setShowToast(true);
         form.reset();
+        
+        // Reset the button state and toast back to idle after 5 seconds
+        setTimeout(() => {
+          setFormStatus('idle');
+          setShowToast(false);
+        }, 5000);
       } else {
         throw new Error('Form submission failed');
       }
@@ -964,10 +1098,10 @@ export default function App() {
   return (
     <div className={`relative min-h-screen ${langChanging ? 'lang-transition-active' : ''}`}>
       {/* Background Animated Glow Spheres */}
-      <div className="bg-glow-wrapper" id="ambient-glows">
+      <motion.div style={{ y: bgY1 }} className="bg-glow-wrapper" id="ambient-glows">
         <div className="bg-glow-1" />
-        <div className="bg-glow-2" />
-      </div>
+        <motion.div style={{ y: bgY2 }} className="bg-glow-2" />
+      </motion.div>
 
       {/* Modern Sticky Navigation */}
       <nav className="fixed top-0 left-0 w-full px-[7%] py-4 flex justify-between items-center backdrop-blur-md bg-slate-950/75 border-b border-white/[0.08] z-50">
@@ -987,11 +1121,22 @@ export default function App() {
         <div className="hidden lg:flex items-center gap-6">
           <button
             onClick={() => setLang(lang === 'si' ? 'en' : 'si')}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.1] hover:border-cyan-400/50 text-xs font-semibold text-slate-200 transition duration-300 cursor-pointer"
+            className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.1] hover:border-cyan-400/50 text-xs font-semibold text-slate-200 transition duration-300 cursor-pointer overflow-hidden min-w-[90px] justify-center"
             id="lang-toggle-desktop"
           >
-            <i className="fas fa-globe text-cyan-400" />
-            <span>{lang === 'si' ? 'English' : 'සිංහල'}</span>
+            <i className="fas fa-globe text-cyan-400 group-hover:animate-spin-slow" />
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={lang}
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 20, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="block"
+              >
+                {lang === 'si' ? 'English' : 'සිංහල'}
+              </motion.span>
+            </AnimatePresence>
           </button>
           <button
             onClick={toggleTheme}
@@ -1008,11 +1153,22 @@ export default function App() {
         <div className="flex lg:hidden items-center gap-4">
           <button
             onClick={() => setLang(lang === 'si' ? 'en' : 'si')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.1] text-xs font-semibold text-slate-200 transition duration-300 cursor-pointer"
+            className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.1] text-xs font-semibold text-slate-200 transition duration-300 cursor-pointer overflow-hidden min-w-[70px] justify-center"
             id="lang-toggle-mobile-top"
           >
-            <i className="fas fa-globe text-cyan-400" />
-            <span>{lang === 'si' ? 'EN' : 'සිං'}</span>
+            <i className="fas fa-globe text-cyan-400 group-hover:animate-spin-slow" />
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={lang}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+                className="block"
+              >
+                {lang === 'si' ? 'EN' : 'සිං'}
+              </motion.span>
+            </AnimatePresence>
           </button>
           <button
             onClick={toggleTheme}
@@ -1086,10 +1242,21 @@ export default function App() {
                 setLang(lang === 'si' ? 'en' : 'si');
                 setMobileMenuOpen(false);
               }}
-              className="flex items-center justify-center gap-1.5 w-full py-3 rounded-full bg-white/[0.05] border border-white/[0.1] text-sm font-semibold text-slate-200 transition duration-300 cursor-pointer"
+              className="group flex items-center justify-center gap-1.5 w-full py-3 rounded-full bg-white/[0.05] border border-white/[0.1] text-sm font-semibold text-slate-200 transition duration-300 cursor-pointer overflow-hidden"
             >
-              <i className="fas fa-globe text-cyan-400" />
-              <span>{lang === 'si' ? 'Switch to English' : 'සිංහල භාෂාවට මාරු වන්න'}</span>
+              <i className="fas fa-globe text-cyan-400 group-hover:animate-spin-slow" />
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={lang}
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: 10, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="block"
+                >
+                  {lang === 'si' ? 'Switch to English' : 'සිංහල භාෂාවට මාරු වන්න'}
+                </motion.span>
+              </AnimatePresence>
             </button>
             <button
               onClick={() => {
@@ -1114,7 +1281,10 @@ export default function App() {
       </nav>
 
       {/* Hero Section */}
-      <section className="min-h-screen flex flex-col lg:flex-row items-center justify-between px-[7%] pt-[140px] pb-16 gap-16">
+      <motion.section 
+        style={{ y: heroY, opacity: heroOpacity }}
+        className="min-h-screen flex flex-col lg:flex-row items-center justify-between px-[7%] pt-[140px] pb-16 gap-16"
+      >
         <div className="flex-1 text-left">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[70px] leading-[1.1] font-extrabold mb-6 tracking-tight">
             {T[lang].heroTitleLine1}<br />
@@ -1143,7 +1313,7 @@ export default function App() {
             />
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Running Numbers Statistics */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-6 px-[7%] pb-24">
@@ -1370,6 +1540,13 @@ export default function App() {
             </div>
           </FadeInView>
         </div>
+      </section>
+
+      {/* Cost Estimator Section */}
+      <section id="estimator" className="px-[7%] py-24 border-t border-white/[0.05]">
+        <FadeInView>
+          <CostEstimator lang={lang} T={T} />
+        </FadeInView>
       </section>
 
       {/* FAQ Accordion Section */}
@@ -1599,38 +1776,89 @@ export default function App() {
 
         <FadeInView className="contact-form-card max-w-[700px] mx-auto bg-white/[0.03] border border-white/[0.08] p-8 sm:p-12 rounded-[30px] backdrop-blur-md">
           <form id="contactForm" onSubmit={handleFormSubmit} className="space-y-4">
-            <div>
-              <input
-                type="text"
-                name="නම"
-                placeholder={T[lang].contactNamePlaceholder}
-                required
-                className="w-full p-4 bg-white/10 border border-white/5 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-400 focus:bg-white/[0.12] transition-all text-sm md:text-base"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder={T[lang].contactNamePlaceholder}
+                  required
+                  className="w-full p-4 bg-white/10 border border-white/5 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-400 focus:bg-white/[0.12] transition-all text-sm md:text-base"
+                />
+              </div>
+              <div>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder={T[lang].contactEmailPlaceholder}
+                  required
+                  className="w-full p-4 bg-white/10 border border-white/5 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-400 focus:bg-white/[0.12] transition-all text-sm md:text-base"
+                />
+              </div>
             </div>
-            <div>
-              <input
-                type="email"
-                name="ඊමේල්"
-                placeholder={T[lang].contactEmailPlaceholder}
-                required
-                className="w-full p-4 bg-white/10 border border-white/5 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-400 focus:bg-white/[0.12] transition-all text-sm md:text-base! "
-              />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder={T[lang].contactPhonePlaceholder}
+                  required
+                  className="w-full p-4 bg-white/10 border border-white/5 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-400 focus:bg-white/[0.12] transition-all text-sm md:text-base"
+                />
+              </div>
+              <div>
+                <select
+                  name="companySize"
+                  defaultValue=""
+                  className="w-full p-4 bg-white/10 border border-white/5 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-400 focus:bg-white/[0.12] transition-all text-sm md:text-base appearance-none cursor-pointer"
+                  style={{ backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1em' }}
+                >
+                  <option value="" disabled hidden>{T[lang].contactCompanySize}</option>
+                  <option value="1-10" className="bg-slate-800">1 - 10</option>
+                  <option value="11-50" className="bg-slate-800">11 - 50</option>
+                  <option value="51-200" className="bg-slate-800">51 - 200</option>
+                  <option value="200+" className="bg-slate-800">200+</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <input
-                type="tel"
-                name="දුරකථනය"
-                placeholder={T[lang].contactPhonePlaceholder}
-                required
-                className="w-full p-4 bg-white/10 border border-white/5 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-400 focus:bg-white/[0.12] transition-all text-sm md:text-base"
-              />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <select
+                  name="serviceInterest"
+                  defaultValue=""
+                  className="w-full p-4 bg-white/10 border border-white/5 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-400 focus:bg-white/[0.12] transition-all text-sm md:text-base appearance-none cursor-pointer"
+                  style={{ backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1em' }}
+                >
+                  <option value="" disabled hidden>{T[lang].contactServiceInterest}</option>
+                  <option value="Web Development" className="bg-slate-800">Web Development</option>
+                  <option value="Branding" className="bg-slate-800">Branding & Strategy</option>
+                  <option value="Digital Marketing" className="bg-slate-800">Digital Marketing</option>
+                  <option value="Social Media" className="bg-slate-800">Social Media Management</option>
+                  <option value="Full Package" className="bg-slate-800">Full Business Package</option>
+                </select>
+              </div>
+              <div>
+                <select
+                  name="budget"
+                  defaultValue=""
+                  className="w-full p-4 bg-white/10 border border-white/5 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-400 focus:bg-white/[0.12] transition-all text-sm md:text-base appearance-none cursor-pointer"
+                  style={{ backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1em' }}
+                >
+                  <option value="" disabled hidden>{T[lang].contactBudget}</option>
+                  <option value="< 100k" className="bg-slate-800">LKR &lt; 100K</option>
+                  <option value="100k - 500k" className="bg-slate-800">LKR 100K - 500K</option>
+                  <option value="> 500k" className="bg-slate-800">LKR 500K+</option>
+                </select>
+              </div>
             </div>
+
             <div>
               <textarea
-                name="අවශ්‍යතාවය"
+                name="message"
                 placeholder={T[lang].contactDescPlaceholder}
-                rows={5}
+                rows={4}
                 className="w-full p-4 bg-white/10 border border-white/5 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-400 focus:bg-white/[0.12] transition-all resize-none text-sm md:text-base"
               />
             </div>
@@ -1808,7 +2036,7 @@ export default function App() {
                 {T[lang].getStarted}
               </a>
               <a
-                href="https://wa.me/94765865387"
+                href={`https://wa.me/94765865387?text=${encodeURIComponent(lang === 'si' ? `මම ${selectedService.title['si']} සේවාව පිළිබඳව දැනගැනීමට කැමතියි.` : `I'm interested in learning more about the ${selectedService.title['en']} service.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="glass-btn flex-1 text-center select-none"
@@ -1832,6 +2060,21 @@ export default function App() {
       >
         <i className="fas fa-chevron-up text-lg" />
       </button>
+
+      {/* Success Toast Banner */}
+      <div 
+        className={`fixed top-24 right-4 md:right-8 z-[100] max-w-sm w-full bg-slate-900 border border-green-500/50 shadow-2xl shadow-green-900/20 rounded-2xl flex items-center p-4 gap-4 transition-all duration-500 ease-out flex-row select-none pointer-events-none transform ${
+          showToast ? 'translate-x-0 opacity-100 scale-100' : 'translate-x-full opacity-0 scale-95'
+        }`}
+      >
+        <div className="flex-shrink-0 w-10 h-10 bg-green-500/20 rounded-full flex justify-center items-center text-green-400 text-xl">
+          <i className="fas fa-check"></i>
+        </div>
+        <div className="flex-1">
+          <h4 className="text-white font-bold text-sm">{lang === 'si' ? 'පණිවිඩය සාර්ථකව යැවිණි' : 'Message Sent Successfully!'}</h4>
+          <p className="text-slate-300 text-xs mt-0.5">{lang === 'si' ? 'අපි ඉක්මනින් ඔබව සම්බන්ධ කරගන්නෙමු.' : 'We will get back to you soon.'}</p>
+        </div>
+      </div>
 
       {/* Floating Sticky Pulse WhatsApp icon button */}
       <a
