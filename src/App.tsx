@@ -3,11 +3,26 @@ import ReactGA from 'react-ga4';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 
 // Interfaces
+interface ServicePhase {
+  name: { si: string; en: string };
+  time: { si: string; en: string };
+  progress: number;
+}
+
+interface ServiceDelivery {
+  durationText: { si: string; en: string };
+  badge: { si: string; en: string };
+  velocity: number;
+  icon: string;
+  phases: ServicePhase[];
+}
+
 interface ServiceDetail {
   id: string;
   icon: string;
   title: { si: string; en: string };
   tagline: { si: string; en: string };
+  deliveryTime: ServiceDelivery;
   what: { si: string[]; en: string[] };
   opportunities: { si: string[]; en: string[] };
   assumptions: { si: string[]; en: string[] };
@@ -96,6 +111,10 @@ const T = {
     contactSuccess: "✓ සාර්ථකව ලැබුණි!",
     contactError: "Error — නැවත උත්සාහ කරන්න",
     footerReserved: "ගමගේ Marketing. සියලුම හිමිකම් ඇවිරිණි.",
+    modalEstimatedDelivery: "ඇස්තමේන්තුගත සම්පූර්ණ කිරීමේ කාලය",
+    modalAvgReadiness: "කාර්යක්ෂමතාව",
+    modalMilestonePhases: "ප්‍රධාන ක්‍රියාත්මක කිරීමේ පියවර",
+    modalEstimatedTimeline: "සම්පූර්ණ කිරීමේ කාලසීමාව",
     modalWhat: "What's Included",
     modalOpp: "Opportunities",
     modalAssumptions: "Assumptions & How We Work",
@@ -169,6 +188,10 @@ const T = {
     contactSuccess: "✓ Successfully Received!",
     contactError: "Error — Try Again",
     footerReserved: "Gamage Marketing. All rights reserved.",
+    modalEstimatedDelivery: "Estimated Completion Time",
+    modalAvgReadiness: "Delivery Velocity",
+    modalMilestonePhases: "Key Execution Milestones",
+    modalEstimatedTimeline: "Turnaround Timeline",
     modalWhat: "What's Included",
     modalOpp: "Opportunities",
     modalAssumptions: "Assumptions & How We Work",
@@ -188,6 +211,17 @@ const SERVICES_DATA: Record<string, ServiceDetail> = {
     tagline: {
       si: 'අපි Facebook, TikTok, සහ Instagram හරහා පාරිභෝගිකයින් ආකර්ෂණය කර ගන්නා ප්‍රචාරණ ව්‍යාපාර සැලසුම් කරමු — සෑම රුපියලකම ප්‍රතිලාභය නිවැරදිව වාර්තා කරමින්.',
       en: 'We craft platform-native campaigns across Facebook, TikTok, and Instagram that turn scrollers into buyers — with every rupee tracked back to real business outcomes.'
+    },
+    deliveryTime: {
+      durationText: { si: 'දින 3 - 5', en: '3 – 5 Days' },
+      badge: { si: 'වේගවත් දියත් කිරීම', en: 'Fast Launch' },
+      velocity: 92,
+      icon: 'fas fa-bolt',
+      phases: [
+        { name: { si: 'ප්‍රේක්ෂක හා තරඟකාරී පර්යේෂණ', en: 'Audience & Competitor Audit' }, time: { si: 'දින 1', en: 'Day 1' }, progress: 100 },
+        { name: { si: 'දැන්වීම් පිටපත් සහ Creative නිර්මාණය', en: 'Ad Copy & Creative Production' }, time: { si: 'දින 2-3', en: 'Days 2-3' }, progress: 85 },
+        { name: { si: 'Campaign Launch & Analytics Setup', en: 'Campaign Launch & Analytics Setup' }, time: { si: 'දින 4-5', en: 'Days 4-5' }, progress: 95 }
+      ]
     },
     what: {
       si: [
@@ -242,6 +276,17 @@ const SERVICES_DATA: Record<string, ServiceDetail> = {
       si: 'ඔබේ ව්‍යාපාරයේ සීමාවන් බිඳ දමමින්, නාලිකා උපාය මාර්ග, ප්‍රචාරණ පද්ධති සහ අඛණ්ඩ ප්‍රශස්තකරණය ඒකාබද්ධ කරමින් සැලසුම් කළ සුවිශේෂී වර්ධන පද්ධතියක්.',
       en: 'A bespoke, data-first marketing system designed to remove the ceiling on your business — combining channel strategy, funnel engineering, and continuous optimisation.'
     },
+    deliveryTime: {
+      durationText: { si: 'දින 5 - 7', en: '5 – 7 Days' },
+      badge: { si: 'උපායමාර්ගික සැලැස්ම', en: 'Strategic Sprint' },
+      velocity: 84,
+      icon: 'fas fa-chart-line',
+      phases: [
+        { name: { si: 'Data Audit & Funnel Diagnosing', en: 'Data Audit & Funnel Diagnostics' }, time: { si: 'දින 1-2', en: 'Days 1-2' }, progress: 100 },
+        { name: { si: 'Customer Journey & Funnel Optimization', en: 'Customer Journey & Funnel Optimization' }, time: { si: 'දින 3-5', en: 'Days 3-5' }, progress: 80 },
+        { name: { si: 'A/B Testing & Scaling Roadmap', en: 'A/B Testing & Scaling Roadmap' }, time: { si: 'දින 6-7', en: 'Days 6-7' }, progress: 90 }
+      ]
+    },
     what: {
       si: [
         'පූර්ණ අලෙවිකරණ විගණනය: නාලිකා, පණිවිඩකරණය, පරිවර්තන ලක්ෂ්‍ය සහ දුර්වලතා හඳුනා ගැනීම.',
@@ -295,6 +340,17 @@ const SERVICES_DATA: Record<string, ServiceDetail> = {
       si: 'පාරිභෝගිකයින් ක්ෂණිකව හඳුනා ගන්නා ලාංඡනයක් සකසමින්, සන්නාමයක් සඳහා උසස් තත්වයේ අනන්‍යතාවයක් සහ වෘත්තීය නිමාවක් අපි නිර්මාණය කරමු.',
       en: 'We build brand identities that command premium positioning — from the logo your customers recognise instantly to the visual language that makes every touchpoint feel intentional.'
     },
+    deliveryTime: {
+      durationText: { si: 'දින 7 - 10', en: '7 – 10 Days' },
+      badge: { si: 'පූර්ණ අනන්‍යතාවය', en: 'Full Identity' },
+      velocity: 78,
+      icon: 'fas fa-palette',
+      phases: [
+        { name: { si: 'Brand Discovery & Moodboards', en: 'Brand Discovery & Moodboards' }, time: { si: 'දින 1-3', en: 'Days 1-3' }, progress: 100 },
+        { name: { si: 'Logo Concepts & Typography Palette', en: 'Logo Concepts & Typography Palette' }, time: { si: 'දින 4-7', en: 'Days 4-7' }, progress: 85 },
+        { name: { si: 'Brand Guidelines & Vector Assets', en: 'Brand Guidelines & Vector Assets' }, time: { si: 'දින 8-10', en: 'Days 8-10' }, progress: 95 }
+      ]
+    },
     what: {
       si: [
         'ලාංඡන (Logo) සැලසුම්කරණය (ප්‍රාථමික, ද්විතීයික සහ අයිකන ප්‍රභේද).',
@@ -347,6 +403,17 @@ const SERVICES_DATA: Record<string, ServiceDetail> = {
     tagline: {
       si: 'පළමු දවසේ සිටම SEO පදනම සහිතව, සෑම උපාංගයකටම ගැළපෙන පරිදි ඉතා වේගවත් සහ පරිශීලක-හිතකාමී වෙබ් අඩවි නිර්මාණය කිරිම.',
       en: 'Blazing-fast, conversion-optimised websites that look premium on every device — built on modern stacks with SEO foundations baked in from day one.'
+    },
+    deliveryTime: {
+      durationText: { si: 'දින 10 - 14', en: '10 – 14 Days' },
+      badge: { si: 'ප්‍රතිචාරාත්මක Full Build', en: 'Full Stack Build' },
+      velocity: 70,
+      icon: 'fas fa-laptop-code',
+      phases: [
+        { name: { si: 'UI/UX Wireframes & Interactive Prototypes', en: 'UI/UX Wireframes & Prototypes' }, time: { si: 'දින 1-4', en: 'Days 1-4' }, progress: 100 },
+        { name: { si: 'Modern Frontend & Mobile Responsive Build', en: 'Frontend & Responsive Build' }, time: { si: 'දින 5-11', en: 'Days 5-11' }, progress: 85 },
+        { name: { si: 'Core Web Vitals, SEO & Production Launch', en: 'Core Web Vitals, SEO & Launch' }, time: { si: 'දින 12-14', en: 'Days 12-14' }, progress: 95 }
+      ]
     },
     what: {
       si: [
@@ -403,6 +470,17 @@ const SERVICES_DATA: Record<string, ServiceDetail> = {
       si: 'පාරිභෝගික විමසීම් හැසිරවීම, ලීඩ්ස් වර්ගීකරණය කිරීම සහ ඔබ නිදා සිටින විට පවා ව්‍යාපාරික පද්ධති ස්වයංක්‍රීයව ක්‍රියාවට නැංවීම සඳහා බුද්ධිමත් පද්ධති යෙදවීම.',
       en: 'Deploy intelligent systems that handle customer enquiries, qualify leads, and run workflows while you sleep — cutting operational costs without sacrificing quality.'
     },
+    deliveryTime: {
+      durationText: { si: 'දින 4 - 7', en: '4 – 7 Days' },
+      badge: { si: 'AI Smart Integration', en: 'AI Integration' },
+      velocity: 88,
+      icon: 'fas fa-robot',
+      phases: [
+        { name: { si: 'Knowledge Base & Workflow Audit', en: 'Knowledge Base & Workflow Audit' }, time: { si: 'දින 1-2', en: 'Days 1-2' }, progress: 100 },
+        { name: { si: 'AI Agent Architecture & Multi-Channel Sync', en: 'AI Agent Architecture & Sync' }, time: { si: 'දින 3-5', en: 'Days 3-5' }, progress: 85 },
+        { name: { si: 'Testing, Fallback Validation & Deployment', en: 'Testing, Fallbacks & Live Deployment' }, time: { si: 'දින 6-7', en: 'Days 6-7' }, progress: 95 }
+      ]
+    },
     what: {
       si: [
         'WhatsApp, Facebook Messenger, සහ ඔබේ වෙබ් අඩවිය සඳහා සකසන ලද බුද්ධිමත් AI Chatbots.',
@@ -455,6 +533,17 @@ const SERVICES_DATA: Record<string, ServiceDetail> = {
     tagline: {
       si: 'ප්‍රේක්ෂකයින් නතර කරන, සන්නාමයේ වටිනාකම පෙන්වන සහ පාරිභෝගික ක්‍රියාවන් උත්තේජනය කරන උසස් තත්ත්වයේ සිනමාත්මක විඩියෝ නිර්මාණය කිරිම.',
       en: 'Cinematic brand films and scroll-stopping short-form content — produced to platform specifications and engineered to drive action, not just views.'
+    },
+    deliveryTime: {
+      durationText: { si: 'දින 5 - 8', en: '5 – 8 Days' },
+      badge: { si: 'සිනමාත්මක නිෂ්පාදනය', en: 'Cinematic Sprint' },
+      velocity: 82,
+      icon: 'fas fa-video',
+      phases: [
+        { name: { si: 'Creative Scripting & Storyboarding', en: 'Creative Scripting & Storyboards' }, time: { si: 'දින 1-2', en: 'Days 1-2' }, progress: 100 },
+        { name: { si: 'Cinematic Filming & Raw Production', en: 'Cinematic Filming & Production' }, time: { si: 'දින 3-5', en: 'Days 3-5' }, progress: 80 },
+        { name: { si: 'Color Grading, Sound Design & Multi-Ratio Exports', en: 'Color Grading, Sound & Multi-Ratio Exports' }, time: { si: 'දින 6-8', en: 'Days 6-8' }, progress: 95 }
+      ]
     },
     what: {
       si: [
@@ -2038,9 +2127,87 @@ export default function App() {
               {selectedService.title[lang]}
             </h2>
 
-            <p className="text-slate-400 text-sm md:text-base leading-[1.8] mb-8 border-b border-white/[0.08] pb-6">
+            <p className="text-slate-400 text-sm md:text-base leading-[1.8] mb-6 border-b border-white/[0.08] pb-6">
               {selectedService.tagline[lang]}
             </p>
+
+            {/* Estimated Project Completion Time & Animated Progress Bars */}
+            <div className="modal-delivery-card rounded-2xl p-5 mb-8">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500/20 to-indigo-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-lg shadow-sm">
+                    <i className={selectedService.deliveryTime.icon} />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-400 block modal-delivery-sub">
+                      {T[lang].modalEstimatedDelivery}
+                    </span>
+                    <div className="text-xl font-bold text-white flex items-center gap-2 modal-delivery-title mt-0.5">
+                      <span>{selectedService.deliveryTime.durationText[lang]}</span>
+                      <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-cyan-400/10 text-cyan-300 border border-cyan-400/20">
+                        {selectedService.deliveryTime.badge[lang]}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-right">
+                  <div>
+                    <span className="text-[11px] text-slate-400 block modal-delivery-sub">
+                      {T[lang].modalAvgReadiness}
+                    </span>
+                    <span className="text-sm font-bold text-emerald-400 flex items-center justify-end gap-1">
+                      <i className="fas fa-gauge-high text-xs" />
+                      {selectedService.deliveryTime.velocity}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Master Animated Progress Bar */}
+              <div className="mb-5">
+                <div className="flex justify-between items-center text-xs text-slate-400 mb-1.5 modal-delivery-sub">
+                  <span>{T[lang].modalEstimatedTimeline}</span>
+                  <span className="font-semibold text-cyan-400">{selectedService.deliveryTime.velocity}%</span>
+                </div>
+                <div className="w-full h-2.5 rounded-full modal-track-bg overflow-hidden p-0.5 border border-white/[0.08]">
+                  <motion.div
+                    className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-indigo-500 to-emerald-400"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${selectedService.deliveryTime.velocity}%` }}
+                    transition={{ duration: 0.9, ease: "easeOut" }}
+                  />
+                </div>
+              </div>
+
+              {/* Phase Milestones Breakdown */}
+              <div className="space-y-3 pt-3 border-t border-white/[0.08]">
+                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-2 modal-delivery-sub">
+                  {T[lang].modalMilestonePhases}
+                </div>
+                {selectedService.deliveryTime.phases.map((phase, idx) => (
+                  <div key={idx} className="space-y-1">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-slate-300 font-medium flex items-center gap-1.5 modal-phase-name">
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                        {phase.name[lang]}
+                      </span>
+                      <span className="text-slate-400 text-[11px] font-mono modal-phase-time">
+                        {phase.time[lang]}
+                      </span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full modal-phase-track overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${phase.progress}%` }}
+                        transition={{ duration: 0.7, delay: 0.15 * (idx + 1), ease: "easeOut" }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* What is included checklist */}
             <div className="mb-6">

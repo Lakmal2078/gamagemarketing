@@ -437,6 +437,49 @@ html.theme-light .modal-content-box button:hover {
   color: #e11d48 !important;
 }
 
+/* Modal Delivery Timeline Card & Animated Progress Bars */
+.modal-delivery-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-track-bg {
+  background-color: rgba(15, 23, 42, 0.85);
+}
+
+.modal-phase-track {
+  background-color: rgba(30, 41, 59, 0.8);
+}
+
+html.theme-light .modal-delivery-card {
+  background: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+html.theme-light .modal-delivery-card .modal-delivery-title {
+  color: #0f172a !important;
+}
+
+html.theme-light .modal-delivery-card .modal-delivery-sub {
+  color: #64748b !important;
+}
+
+html.theme-light .modal-delivery-card .modal-phase-name {
+  color: #1e293b !important;
+}
+
+html.theme-light .modal-delivery-card .modal-phase-time {
+  color: #64748b !important;
+}
+
+html.theme-light .modal-track-bg {
+  background-color: #e2e8f0 !important;
+}
+
+html.theme-light .modal-phase-track {
+  background-color: #e2e8f0 !important;
+}
+
 /* Footer Section */
 html.theme-light footer {
   border-top-color: rgba(15, 23, 42, 0.08) !important;

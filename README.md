@@ -4,13 +4,15 @@ A modern, highly interactive, and bilingual (English & Sinhala) landing page for
 
 ## 🌟 Features
 
-- **Bilingual Support (English & Sinhala):** Seamlessly switch between languages with smooth animations and state persistence.
-- **Interactive Project Cost Estimator:** A built-in calculator allowing clients to estimate out their project costs based on different service modules.
-- **Advanced Contact Form:** Capture lead specific requirements through a comprehensive and stylish form.
-- **High-Performance Animations:** Premium scroll effects, parallax sections, and smooth micro-interactions powered by Framer Motion.
-- **Responsive & Mobile-First:** Carefully crafted to perform beautifully on all screen sizes.
+- **Bilingual Support (English & Sinhala):** Seamlessly switch between languages with instant updates and `localStorage` persistence across browser sessions.
+- **Persistent Theme Switching (Dark & Light Mode):** Dynamic theme switcher supporting dark and light modes, with automatic system preference detection (`prefers-color-scheme`) and session persistence.
+- **Service Detail Modal with Dynamic Completion Progress Bars:** Interactive service modals showing detailed deliverables, opportunities, working assumptions, and dynamically animated milestone progress bars, readiness scores, and turnaround timelines for each service.
+- **Interactive Project Cost Estimator:** A built-in calculator allowing clients to estimate project costs based on selected service modules.
+- **Advanced Contact Form:** Capture lead-specific requirements through a comprehensive and stylish form with real-time feedback toast notifications.
+- **High-Performance Animations:** Premium scroll effects, parallax sections, and smooth micro-interactions powered by Motion (`motion/react`).
+- **Responsive & Mobile-First:** Carefully crafted to perform smoothly across smartphones, tablets, laptops, and ultra-wide desktops.
+- **Cloudflare Ready:** Pre-configured with `wrangler.toml` for one-command deployment to Cloudflare Pages and Workers.
 - **Google Analytics Integration:** Built-in React-GA4 event tracking.
-- **Modern UI/UX Elements:** Glassmorphism cards, animated gradients, and floating action buttons.
 
 ## 🛠️ Technologies Used
 
@@ -55,6 +57,30 @@ Follow these steps to set up the project locally:
    ```bash
    npm run build
    ```
+
+## ☁️ Cloudflare Deployment
+
+The application is pre-configured with `wrangler.toml` for seamless deployment to Cloudflare Pages or Cloudflare Workers:
+
+1. **Authenticate with Wrangler (one-time setup):**
+   ```bash
+   npx wrangler login
+   ```
+
+2. **Deploy directly to Cloudflare Pages:**
+   ```bash
+   npm run deploy:pages
+   ```
+
+   Or deploy using standard Wrangler:
+   ```bash
+   npm run deploy
+   ```
+
+3. **Cloudflare Configuration (`wrangler.toml`):**
+   - Project name: `gamagemarketing`
+   - Compatibility date: `2024-09-23`
+   - Static build directory: `dist`
 
 ## 📂 Project Structure
 
