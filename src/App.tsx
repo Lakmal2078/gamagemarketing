@@ -928,16 +928,33 @@ export default function App() {
   const bgY1 = useTransform(scrollY, [0, 2000], [0, -600]);
   const bgY2 = useTransform(scrollY, [0, 2000], [0, 800]);
 
-  // Language State (Sinhala default)
+  // Language State (Persisted in localStorage across sessions, defaults to Sinhala)
   const [lang, setLang] = useState<'si' | 'en'>(() => {
-    return (localStorage.getItem('lang') as 'si' | 'en') || 'si';
+    try {
+      const savedLang = localStorage.getItem('lang');
+      if (savedLang === 'si' || savedLang === 'en') {
+        return savedLang;
+      }
+    } catch {
+      // Fallback if localStorage is inaccessible
+    }
+    return 'si';
   });
+
+  const toggleLang = () => {
+    setLang(prev => (prev === 'si' ? 'en' : 'si'));
+  };
 
   const [langChanging, setLangChanging] = useState(false);
 
-  // Track language changes and trigger a subtle visual refresh animation
+  // Synchronize language changes with localStorage, document element, and trigger visual refresh animation
   useEffect(() => {
-    localStorage.setItem('lang', lang);
+    try {
+      localStorage.setItem('lang', lang);
+    } catch (e) {
+      console.warn('Failed to save language to localStorage:', e);
+    }
+    document.documentElement.lang = lang;
     setLangChanging(true);
     const timer = setTimeout(() => {
       setLangChanging(false);
@@ -945,18 +962,38 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [lang]);
 
-  // Theme State (Dark mode is default, persisted in local storage)
+  // Theme State (Persisted in localStorage with system preference check during initial load)
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
+    try {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        return savedTheme;
+      }
+      if (typeof window !== 'undefined' && window.matchMedia) {
+        if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+          return 'light';
+        }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+      }
+    } catch {
+      // Fallback if localStorage or matchMedia is restricted
+    }
+    return 'dark';
   });
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  // Sync theme changes with the root HTML elements
+  // Sync theme changes with the root HTML elements and persist across all sessions
   useEffect(() => {
-    localStorage.setItem('theme', theme);
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (e) {
+      console.warn('Failed to save theme to localStorage:', e);
+    }
     const root = document.documentElement;
     if (theme === 'light') {
       root.classList.add('theme-light');
@@ -964,6 +1001,28 @@ export default function App() {
       root.classList.remove('theme-light');
     }
   }, [theme]);
+
+  // Listen to OS/browser system color scheme changes if user hasn't explicitly set a preference
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      try {
+        const hasManualPref = localStorage.getItem('theme');
+        // Only react to OS changes if the user has not manually set a preference
+        if (!hasManualPref) {
+          setTheme(e.matches ? 'light' : 'dark');
+        }
+      } catch {
+        // Ignore localStorage access errors
+      }
+    };
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleSystemThemeChange);
+      return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    }
+  }, []);
 
   // Scroll to Top Button state
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -1120,9 +1179,11 @@ export default function App() {
 
         <div className="hidden lg:flex items-center gap-6">
           <button
-            onClick={() => setLang(lang === 'si' ? 'en' : 'si')}
+            onClick={toggleLang}
             className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.1] hover:border-cyan-400/50 text-xs font-semibold text-slate-200 transition duration-300 cursor-pointer overflow-hidden min-w-[90px] justify-center"
             id="lang-toggle-desktop"
+            title={lang === 'si' ? 'Switch to English' : 'සිංහල භාෂාවට මාරු වන්න'}
+            aria-label={lang === 'si' ? 'Switch to English' : 'සිංහල භාෂාවට මාරු වන්න'}
           >
             <i className="fas fa-globe text-cyan-400 group-hover:animate-spin-slow" />
             <AnimatePresence mode="wait">
@@ -1152,9 +1213,11 @@ export default function App() {
         {/* Mobile Menu Toggle & Lang Toggle */}
         <div className="flex lg:hidden items-center gap-4">
           <button
-            onClick={() => setLang(lang === 'si' ? 'en' : 'si')}
+            onClick={toggleLang}
             className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.1] text-xs font-semibold text-slate-200 transition duration-300 cursor-pointer overflow-hidden min-w-[70px] justify-center"
             id="lang-toggle-mobile-top"
+            title={lang === 'si' ? 'Switch to English' : 'සිංහල භාෂාවට මාරු වන්න'}
+            aria-label={lang === 'si' ? 'Switch to English' : 'සිංහල භාෂාවට මාරු වන්න'}
           >
             <i className="fas fa-globe text-cyan-400 group-hover:animate-spin-slow" />
             <AnimatePresence mode="wait">
@@ -1239,10 +1302,12 @@ export default function App() {
           <div className="pt-6 flex flex-col gap-4">
             <button
               onClick={() => {
-                setLang(lang === 'si' ? 'en' : 'si');
+                toggleLang();
                 setMobileMenuOpen(false);
               }}
               className="group flex items-center justify-center gap-1.5 w-full py-3 rounded-full bg-white/[0.05] border border-white/[0.1] text-sm font-semibold text-slate-200 transition duration-300 cursor-pointer overflow-hidden"
+              id="lang-toggle-mobile-sidebar"
+              aria-label={lang === 'si' ? 'Switch to English' : 'සිංහල භාෂාවට මාරු වන්න'}
             >
               <i className="fas fa-globe text-cyan-400 group-hover:animate-spin-slow" />
               <AnimatePresence mode="wait">
@@ -2051,7 +2116,7 @@ export default function App() {
       {/* Floating Scroll to Top button */}
       <button
         onClick={handleScrollToTop}
-        className={`fixed bottom-28 right-8 w-12 h-12 rounded-full flex items-center justify-center text-white bg-slate-900/85 hover:bg-slate-800 border border-white/20 hover:border-cyan-400 hover:text-cyan-400 backdrop-blur-md shadow-2xl z-40 transition-all duration-300 cursor-pointer ${
+        className={`fixed bottom-6 right-6 w-12 h-12 rounded-full flex items-center justify-center text-white bg-slate-900/85 hover:bg-slate-800 border border-white/20 hover:border-cyan-400 hover:text-cyan-400 backdrop-blur-md shadow-2xl z-40 transition-all duration-300 cursor-pointer ${
           showScrollTop ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-75 pointer-events-none'
         }`}
         aria-label={T[lang].scrollToTop}
@@ -2075,17 +2140,6 @@ export default function App() {
           <p className="text-slate-300 text-xs mt-0.5">{lang === 'si' ? 'අපි ඉක්මනින් ඔබව සම්බන්ධ කරගන්නෙමු.' : 'We will get back to you soon.'}</p>
         </div>
       </div>
-
-      {/* Floating Sticky Pulse WhatsApp icon button */}
-      <a
-        href="https://wa.me/94765865387"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 w-16 h-16 bg-[#25d366] rounded-full flex items-center justify-center text-white text-3xl shadow-xl hover:scale-105 transition-all z-40 animate-pulse-slow cursor-pointer"
-        aria-label="Contact us directly on WhatsApp"
-      >
-        <i className="fab fa-whatsapp" />
-      </a>
     </div>
   );
 }

@@ -6,6 +6,27 @@
     <meta name="description" content="ගමගේ Marketing - ශ්‍රී ලංකාවේ ප්‍රමුඛ Digital Marketing Agency. AI-driven marketing, premium branding, web development සහ growth strategies." />
     <meta name="keywords" content="digital marketing, social media marketing, branding, web development, Sri Lanka" />
     <title>ගමගේ Marketing | Premium Digital Agency</title>
+    <!-- Early theme and language resolution to prevent layout/style flashes -->
+    <script>
+      (function() {
+        try {
+          var savedLang = localStorage.getItem('lang');
+          if (savedLang === 'si' || savedLang === 'en') {
+            document.documentElement.lang = savedLang;
+          }
+          var savedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+          var activeTheme = (savedTheme === 'light' || savedTheme === 'dark')
+            ? savedTheme
+            : (prefersLight ? 'light' : 'dark');
+          if (activeTheme === 'light') {
+            document.documentElement.classList.add('theme-light');
+          } else {
+            document.documentElement.classList.remove('theme-light');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#0f172a" />
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />
