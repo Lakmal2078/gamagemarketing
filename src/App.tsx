@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, FormEvent, ReactNode } from 'react';
 import ReactGA from 'react-ga4';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
+import { GoogleDriveBackupModal } from './components/GoogleDriveBackupModal';
 
 // Interfaces
 interface ServicePhase {
@@ -122,6 +123,8 @@ const T = {
     themeLight: "පැහැදිලි තේමාව",
     themeDark: "අඳුරු තේමාව",
     scrollToTop: "මුදුනටම යන්න",
+    driveBackup: "Google Drive උපස්ථය",
+    driveBackupBtn: "Drive Backup",
   },
   en: {
     logo: "Gamage Marketing",
@@ -199,6 +202,8 @@ const T = {
     themeLight: "Light Theme",
     themeDark: "Dark Theme",
     scrollToTop: "Scroll to Top",
+    driveBackup: "Google Drive Backup",
+    driveBackupBtn: "Drive Backup",
   }
 };
 
@@ -1146,6 +1151,9 @@ export default function App() {
   // Modal Service State
   const [selectedService, setSelectedService] = useState<ServiceDetail | null>(null);
 
+  // Google Drive Backup Modal State
+  const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
+
   // Testimonial Scroll Tracker State
   const [activeReviewIndex, setActiveReviewIndex] = useState(0);
   const reviewsTrackRef = useRef<HTMLDivElement | null>(null);
@@ -1296,6 +1304,16 @@ export default function App() {
           >
             <i className={theme === 'dark' ? "fas fa-sun text-amber-400" : "fas fa-moon text-indigo-400"} />
           </button>
+          <button
+            onClick={() => setIsDriveModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.1] hover:border-amber-400/50 text-xs font-semibold text-slate-200 transition duration-300 cursor-pointer"
+            id="drive-backup-desktop"
+            title={T[lang].driveBackup}
+            aria-label={T[lang].driveBackup}
+          >
+            <i className="fab fa-google-drive text-amber-400" />
+            <span className="hidden xl:inline">{T[lang].driveBackupBtn}</span>
+          </button>
           <a href="#contact" className="btn select-none">{T[lang].getStarted}</a>
         </div>
 
@@ -1422,6 +1440,17 @@ export default function App() {
             >
               <i className={theme === 'dark' ? "fas fa-sun text-amber-400" : "fas fa-moon text-indigo-400"} />
               <span>{theme === 'dark' ? T[lang].themeLight : T[lang].themeDark}</span>
+            </button>
+            <button
+              onClick={() => {
+                setIsDriveModalOpen(true);
+                setMobileMenuOpen(false);
+              }}
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-full bg-white/[0.05] border border-white/[0.1] text-sm font-semibold text-slate-200 hover:border-amber-400/50 transition duration-300 cursor-pointer"
+              id="drive-backup-mobile-sidebar"
+            >
+              <i className="fab fa-google-drive text-amber-400" />
+              <span>{T[lang].driveBackup}</span>
             </button>
             <a
               href="#contact"
@@ -2096,6 +2125,16 @@ export default function App() {
           </a>
         </div>
         <p className="text-xs md:text-sm">{T[lang].footerReserved}</p>
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={() => setIsDriveModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-slate-300 hover:text-white transition-all cursor-pointer"
+            id="footer-drive-backup"
+          >
+            <i className="fab fa-google-drive text-amber-400" />
+            <span>{T[lang].driveBackup}</span>
+          </button>
+        </div>
       </footer>
 
       {/* Floating Service Details Modal */}
@@ -2307,6 +2346,13 @@ export default function App() {
           <p className="text-slate-300 text-xs mt-0.5">{lang === 'si' ? 'අපි ඉක්මනින් ඔබව සම්බන්ධ කරගන්නෙමු.' : 'We will get back to you soon.'}</p>
         </div>
       </div>
+
+      {/* Google Drive Backup / Export Modal */}
+      <GoogleDriveBackupModal
+        isOpen={isDriveModalOpen}
+        onClose={() => setIsDriveModalOpen(false)}
+        lang={lang}
+      />
     </div>
   );
 }
